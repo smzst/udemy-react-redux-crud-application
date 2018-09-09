@@ -4,12 +4,19 @@ import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form'
 import { Link } from 'react-router-dom'
 
-import { postEvent } from '../actions'
+import { getEvent, deleteEvent, putEvent } from '../actions'
 
-class EventsNew extends Component {
+class EventsShow extends Component {
   constructor(props) {
     super(props)
     this.onSubmit = this.onSubmit.bind(this)
+    this.onDeleteClick = this.onDeleteClick.bind(this)
+  }
+
+  // 閲覧画面に直接アクセスした時にURLからidを取得して該当する情報を取得させる
+  componentDidMount() {
+    const { id } = this.props.match.params
+    if (id) this.props.getEvent(id)
   }
 
   renderField(field) {
@@ -24,7 +31,13 @@ class EventsNew extends Component {
   }
 
   async onSubmit(values) {
-    await this.props.postEvent(values)
+    await this.props.putEvent(values)
+    this.props.history.push('/')
+  }
+
+  async onDeleteClick() {
+    const { id } = this.props.match.params
+    await this.props.deleteEvent(id)
     this.props.history.push('/')
   }
 
@@ -41,6 +54,7 @@ class EventsNew extends Component {
         <div>
           <input type="submit" value="Submit" disabled={pristine || submitting || invalid} />
           <Link to="/">Cancel</Link>
+          <Link to="/" onClick={this.onDeleteClick}>Delete</Link>
         </div>
       </form>
     )
@@ -56,9 +70,15 @@ const validate = values => {
   return errors
 }
 
-// あるアクションが発生したときタイプに応じた状態遷移を実行する機能を持つ関数
-const mapDispatchToProps = ({ postEvent })
+const mapStateToProps = (state, ownProps) => {
+  const event = state.events[ownProps.match.params.id]
+  return { initialValues: event, event }
+}
 
-export default connect(null, mapDispatchToProps)(
-  reduxForm({ validate, form: 'eventNewForm' })(EventsNew)
+// あるアクションが発生したときタイプに応じた状態遷移を実行する機能を持つ関数
+const mapDispatchToProps = ({ deleteEvent, getEvent, putEvent })
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+  // enableReinitialize: trueを指定すると、initialValueが変わるたびにformが初期化される
+  reduxForm({ validate, form: 'eventShowForm', enableReinitialize: true })(EventsShow)
 )
