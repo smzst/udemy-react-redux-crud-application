@@ -1,12 +1,13 @@
-export const INCREMENT = 'INCREMENT'
-export const DECREMENT = 'DECREMENT'
+import axios from 'axios'
 
-// action: typeというキーを持つオブジェクト
-// actionが発生したときに、actionに組み込まれているtypeに応じて状態をどう変更するかのreducerを定義する
-export const increment = () => ({
-  type: 'INCREMENT'
-})
+export const READ_EVENTS = 'READ_EVENTS'
 
-export const decrement = () => ({
-  type: 'DECREMENT'
-})
+const ROOT_URL = 'https://udemy-utils.herokuapp.com/api/v1'
+const QUERYSTRING = '?token=token123'
+
+// 外部APIに対してリクエストを投げる役割
+// thunkによってaction-creatorがactionの代わりに関数を返すことが可能になる
+export const readEvents = () => async dispatch => {
+  const response = await axios.get(`${ROOT_URL}/events${QUERYSTRING}`)
+  dispatch({ type: READ_EVENTS, response })
+}

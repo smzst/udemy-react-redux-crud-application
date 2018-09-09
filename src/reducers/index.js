@@ -1,6 +1,6 @@
 // combineReducers: reducerを結合するための関数
 import { combineReducers } from 'redux'
-import count from './count'
+import events from './events'
 
-// countってreducerとして定義したcount.jsのこと
-export default combineReducers({ count })
+// eventsってreducerとして定義したevents.jsのこと
+export default combineReducers({ events })
